@@ -24,7 +24,9 @@
 </head>
 
 <body>
+
     <div class="wrap">
+        <h1>图片转字符图</h1>
         <input type="file" name="" id="file" onchange="loadFile();" value="请选择正确的图片文件（大小100k以下为佳）">
         <p id='warning' class="p-warn" style="display: none">请选择正确的图片文件（大小100k以下为佳）</p>
         <div>
@@ -34,7 +36,7 @@
     </div>
    
   
-    <a href="https://github.com/you"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://o7bk1ffzo.bkt.clouddn.com/1491823642174" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
+    <a href="https://github.com/hk029/img2ch"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://o7bk1ffzo.bkt.clouddn.com/1491823642174" alt="Fork me on GitHub"></a>
     <script>
      function $(params) {
             return document.querySelector(params);
@@ -62,6 +64,7 @@
 
         rFile.onload = function (oFREvent) {
                 img.src = this.result;
+                img.style.width = 300+'px';
                 content.innerText = "";
         };
 
