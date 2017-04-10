@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>img2ch</title>
+    <style>
+        .wrap{
+            margin:20px 0 0 100px;
+        }
+        p{
+            font:12px/12px '宋体';
+            margin: 0;
+            padding:0;
+        }
+        .p-warn{
+            color:red;
+            margin:10px 0;
+            font-size:16px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <input type="file" name="" id="file" onchange="loadFile();" value="请选择正确的图片文件（大小100k以下为佳）">
+        <p id='warning' class="p-warn" style="display: none">请选择正确的图片文件（大小100k以下为佳）</p>
+        <div>
+            <canvas id="cv"></canvas>
+        </div>
+        <div id="charPic"></div>
+    </div>
+   
+  
+    <a href="https://github.com/you"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://o7bk1ffzo.bkt.clouddn.com/1491823642174" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
+    <script>
+     function $(params) {
+            return document.querySelector(params);
+        }
+
+        var rFile = new FileReader();
+        var file = $('#file');
+        var warn = $('#warning');
+        var chPic = $('#charPic');
+        var cv = $('#cv'),
+            ctx = cv.getContext('2d');
+        var img = document.createElement('img');  //创建一个放图片的地方
+        
+        var rFilter = /^(?:image\/bmp||image\/gif|image\/jpeg|image\/jpg|image\/png|image\/svg\+xml|image\/tiff)$/i;
+
+        function loadFile() {
+            var ifile = file.files[0];
+            if (rFilter.test(ifile.type)) {
+                rFile.readAsDataURL(file.files[0]);
+                warn.style.display='none';
+            }else{
+                warn.style.display='block';
+            }
+        }
+
+        rFile.onload = function (oFREvent) {
+                img.src = this.result;
+                content.innerText = "";
+        };
+
+        //当图片载入完毕后执行转换操作
+        img.onload = function() {
+            //获取img的长宽，为后面的getImageData提供参数
+            var w = img.width,
+                h = img.height;
+            //把canvas的布局做出来
+            cv.width = w;
+            cv.height = h;
+            //把图片数据放进去
+            ctx.drawImage(img, 0, 0);
+            //开始读取图片数据
+            var imgData = ctx.getImageData(0, 0, w, h),
+                imgArr = imgData.data;
+            var cur = 0;
+            var p = '<p>';
+            var html = '';
+            //每12*6个像素点做一次灰度画，用一个字符代替
+            for (var i = 0; i < h; i += 12) {
+                var p = '<p>';
+                for (j = 0; j < w; j += 6) {
+                    //每个像素点占4个单位
+                    var index = (j + w * i) * 4;
+                    var r = imgArr[index];
+                    var g = imgArr[index + 1];
+                    var b = imgArr[index + 2];
+                    var gray = getGray(r, g, b);
+                    p += toText(gray);
+                }
+                p += '</p>';
+                html += p;
+            }
+            chPic.innerHTML = html;
+        }
+        //转换字符，这里字符选取的规则是由复杂到简单（空白由少到多，体现灰度关系）
+        function toText(g) {
+            //字符可以自由替换
+            var charList = ['$','&','%','*','c','o','+','.','&ensp;'];
+            var len = charList.length;
+            var step = 255/len;
+            return charList[parseInt(g/step)];
+        }
+        //灰度转换公式
+        function getGray(r, g, b) {
+            return 0.299 * r + 0.578 * g + 0.114 * b;
+        }
+
+    </script>
+</body>
+
+</html>
